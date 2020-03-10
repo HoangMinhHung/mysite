@@ -21,15 +21,23 @@ def index(request):
 
     num_genres = Genre.objects.all().count()
     num_books_word = Book.objects.filter(title__icontains='c').count()
+
+    # Part7: Session
+    # Number of visits to this view, as counted in the session variable.
+    num_visits = request.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits + 1
+    request.session.set_expiry(0)
     context = {
         'num_books': num_books,
         'num_instances': num_instances,
         'num_instances_available': num_instances_available,
         'num_authors': num_authors,
         'num_genres': num_genres,
-        'num_books_word': num_books_word
+        'num_books_word': num_books_word,
+        'num_visits': num_visits
     }
-
+    print(request.session.get_expiry_date())
+    print(request.session.get_expiry_age())
     return render(request, 'catalog/index.html', context=context)
 
 
