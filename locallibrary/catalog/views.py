@@ -14,7 +14,7 @@ def index(request):
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
 
     num_authors = Author.objects.count()
-    
+
     # Challenge: Modify the view to generate counts for genres and books that contain a particular word (case
     # insensitive), and pass the results to the context.
 
