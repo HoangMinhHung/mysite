@@ -1,0 +1,21 @@
+{% extends "catalog/base_generic.html" %}
+
+{% block content %}
+<h1>Title: {{ author.last_name }}</h1>
+
+<p><strong>FisrtName:</strong>{{ author.first_name }}</a></p>
+<p><strong>LastName:</strong>{{ author.last_name }}</a></p>
+<p><strong>Dob:</strong> {{ author.date_of_birth }}</p>
+
+<div style="margin-left:20px;margin-top:20px">
+    <h4>Book</h4>
+
+    {% for copy in author.book_set.all %}
+    <hr>
+    <p class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'm' %}text-danger{% else %}text-warning{% endif %}">
+        {{ copy.get_status_display }}
+    </p>
+    <p><strong>Title:</strong><a href="{% url 'book-detail' copy.pk %}"> {{ copy.title }}</a></p>
+    {% endfor %}
+</div>
+{% endblock %}
