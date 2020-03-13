@@ -1,5 +1,5 @@
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 import datetime
@@ -21,7 +21,7 @@ def index(request):
 
     num_books = Book.objects.all().count()
     num_instances = BookInstance.objects.all().count()
-
+    print(request.user.user_permissions.all())
     # Available books (status = 'a')
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
 
@@ -35,7 +35,6 @@ def index(request):
 
     # Part7: Session
     # Number of visits to this view, as counted in the session variable.
-    request.session.set_expiry(0)
     num_visits = request.session.get('num_visits', 0)
     request.session['num_visits'] = num_visits + 1
     context = {
@@ -67,16 +66,25 @@ class BookDetailView(generic.DetailView):
 class AuthorListView(generic.ListView):
     # model = Author
     context_object_name = 'author_list'  # your own name for the list as a template variable
-    queryset = Author.objects.all()  # Get 5 books containing the title c
+    queryset = Author.objects.all()
     template_name = 'catalog/author_list.html'  # Specify your own template name/location
-    paginate_by = 2
+    paginate_by = 10
 
 
 class AuthorDetailView(generic.DetailView):
     model = Author
 
 
-class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+# class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
+#     """Generic class-based view listing books on loan to current user."""
+#     model = BookInstance
+#     template_name = 'catalog/bookinstance_list_borrowed_user.html'
+#     paginate_by = 10
+#
+#     def get_queryset(self):
+#         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
+
+class LoanedBooksByUserListView(LoginRequiredMixin,  generic.ListView):
     """Generic class-based view listing books on loan to current user."""
     model = BookInstance
     template_name = 'catalog/bookinstance_list_borrowed_user.html'
@@ -86,9 +94,9 @@ class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
 
 
-class LoanedBooks(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+class LoanedBooks(PermissionRequiredMixin, LoginRequiredMixin, generic.ListView):
     """Generic class-based view listing books on loan to current user."""
-    permission_required = 'can_mark_returned'
+    permission_required = 'catalog.can_mark_returned'
     model = BookInstance
     template_name = 'catalog/borrowed_book.html'
     paginate_by = 10
@@ -97,7 +105,8 @@ class LoanedBooks(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView)
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
 
 
-@permission_required('can_mark_returned')
+@login_required
+@permission_required('catalog.can_mark_returned')
 def renew_book_librarian(request, pk):
     book_instance = get_object_or_404(BookInstance, pk=pk)
 
