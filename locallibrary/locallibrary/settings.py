@@ -125,6 +125,8 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = '/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Heroku: Update database configuration from $DATABASE_URL.
@@ -135,5 +137,6 @@ DATABASES['default'].update(db_from_env)
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-ALLOWED_HOSTS = ['gentle-atoll-54610.herokuapp.com']
-
+# ALLOWED_HOSTS = ['gentle-atoll-54610.herokuapp.com']
+ALLOWED_HOSTS = ['*']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
