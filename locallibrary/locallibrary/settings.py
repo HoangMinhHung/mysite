@@ -71,8 +71,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'locallibrary.wsgi.application'
-
+# WSGI_APPLICATION = 'locallibrary.wsgi.application'
+WSGI_APPLICATION = 'locallibrary.locallibrary.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
